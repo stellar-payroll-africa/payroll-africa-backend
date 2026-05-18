@@ -1,0 +1,16 @@
+{
+  "name": "stellarpayroll-africa",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "docker compose up -d postgres redis && concurrently \"npm run dev -w apps/api\" \"npm run dev -w apps/dashboard\"",
+    "test": "npm run test --workspaces --if-present",
+    "build": "npm run build --workspaces --if-present"
+  },
+  "devDependencies": {
+    "concurrently": "8.2.2"
+  }
+}

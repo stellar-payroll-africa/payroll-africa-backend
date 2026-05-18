@@ -1,0 +1,43 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: stellarpayroll
+      POSTGRES_USER: stellarpayroll
+      POSTGRES_PASSWORD: stellarpayroll
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./docs/migrations:/docker-entrypoint-initdb.d
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  api:
+    build: ./apps/api
+    ports:
+      - "8080:8080"
+    environment:
+      DATABASE_URL: postgres://stellarpayroll:stellarpayroll@postgres:5432/stellarpayroll
+      REDIS_URL: redis://redis:6379
+      STELLAR_NETWORK: testnet
+    depends_on:
+      - postgres
+      - redis
+
+  dashboard:
+    build: ./apps/dashboard
+    ports:
+      - "3000:3000"
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:8080
+    depends_on:
+      - api
+
+volumes:
+  pgdata:
